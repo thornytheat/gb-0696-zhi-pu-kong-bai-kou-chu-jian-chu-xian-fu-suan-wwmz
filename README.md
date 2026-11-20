@@ -14,7 +14,11 @@ docker compose exec -T app pytest -q
 docker compose config --quiet
 ```
 
-浏览器访问 http://localhost:18210 。默认载入仓内样例。工具条可选择CSV文件运行；样例文件位于 `sample_data/instrument.csv`。重复执行同一内容复用同一批次。
+浏览器访问 http://localhost:18210 。默认载入仓内样例。工具条可选择CSV文件运行；样例文件位于 `sample_data/instrument.csv`，土壤浸提液基体抑制加标样例位于 `sample_data/soil_spike.csv`。重复执行同一内容复用同一批次，不新增结论。
+
+## 加标回收与签发
+
+CSV的kind可取spike表示基体加标行：sample_id填母样编号，level为加标量。复核页(/module/7)对每份样品给出签发依据与可签发状态：自身加标→可签发；同批均值→可签发·借据(明确标注，不与自身加标同等)；无证据→外标未修正·暂缓签发。修正浓度=外标浓度÷回收率，检出状态按签发浓度复算。页面可切换依据，失败保留原报告；浓度、检出状态与证据导出来自同一份resolved记录；原始进样行随导出保留。
 
 ## 模块
 

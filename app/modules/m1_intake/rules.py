@@ -8,7 +8,8 @@ def apply(ctx):
     kept=[];seen={}
     for r in rows:
         if not r["sample_id"]: quarantine(ctx,r,"ID_REQUIRED");continue
-        key=(r["batch"],r["analyte"],r["sample_id"])
+        # 加标行(kind=spike)与母样共享编号，去重键并入类型；其余类型维持原唯一性
+        key=(r["batch"],r["analyte"],r["sample_id"],r["kind"] if r["kind"]=="spike" else "")
         content=tuple(r[k] for k in FIELDS)
         if key in seen:
             quarantine(ctx,r,"DUPLICATE" if seen[key]==content else "KEY_CONFLICT");continue

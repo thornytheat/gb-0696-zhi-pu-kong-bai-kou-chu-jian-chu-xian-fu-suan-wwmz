@@ -27,6 +27,11 @@
 | TRAP-14 | 业务键冲突 | 静默采信错误值 | 保留首条并隔离冲突 | `app/modules/m1_intake/rules.py` | `tests/test_intake.py::test_intake_conflicting_key` |
 | TRAP-15 | 单位混合 | 静默采信错误值 | 浓度单位归一 | `app/modules/m2_internal/rules.py` | `tests/test_internal.py::test_internal_units` |
 | TRAP-19 | 多个质控标记 | 静默采信错误值 | 显式优先级 | `app/modules/m6_quality/rules.py` | `tests/test_quality.py::test_quality_priority` |
+| TRAP-20 | 加标行冒充结果 | 加标响应混入样品结论 | 加标行只作证据不进quality | `app/modules/m6_quality/rules.py` | `tests/test_spike.py::test_spike_not_a_reportable_result` |
+| TRAP-21 | 借据看似同等可靠 | 批均修正与自身加标无差别 | 依据与可签发状态分列，借据标注 | `app/modules/m7_review/rules.py` | `tests/test_spike.py::test_borrowed_basis_not_equally_reliable` |
+| TRAP-22 | 切换依据失败丢报告 | 部分写入后报错 | 先校验后落库，失败不写库 | `app/store.py` | `tests/test_spike.py::test_switch_unavailable_keeps_original` |
+| TRAP-23 | 重跑覆盖复核结论 | 同一文件产生新批次 | 摘要主键复用原批次 | `app/store.py` | `tests/test_spike.py::test_rerun_adds_no_new_conclusion` |
+| TRAP-24 | 页面与导出各算各的 | 浓度/检出状态不一致 | resolved单一来源 | `app/modules/m7_review/rules.py` | `tests/test_spike.py::test_export_same_source_as_page` |
 
 ## 对账规则
 

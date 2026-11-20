@@ -43,6 +43,12 @@ def review(payload:object=Body(...)):
     if not isinstance(payload.get("id"),str) or not isinstance(payload.get("decision"),str): raise BusinessError("REVIEW","复核编号与决定须为文本")
     if type(payload.get("revision")) is not int: raise BusinessError("REVISION","版本须为整数")
     return store.review(str(payload.get("id","")),payload["revision"],payload.get("decision"))
+@app.post("/api/basis")
+def basis(payload:object=Body(...)):
+    payload=object_payload(payload)
+    if not all(isinstance(payload.get(k),str) for k in ("id","key","basis")): raise BusinessError("BASIS","编号、样品键与依据须为文本")
+    if type(payload.get("revision")) is not int: raise BusinessError("REVISION","版本须为整数")
+    return store.switch_basis(payload["id"],payload["revision"],payload["key"],payload["basis"])
 @app.get("/api/export/{ident}")
 def export(ident:str):
     return Response(evidence_csv(store.get(ident)),media_type="text/csv",headers={"Content-Disposition":"attachment; filename=evidence.csv"})

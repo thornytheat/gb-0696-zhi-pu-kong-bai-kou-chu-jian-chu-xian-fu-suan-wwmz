@@ -37,3 +37,26 @@ def review(ident,revision,decision):
         changed=db.execute("UPDATE runs SET revision=revision+1,decision=? WHERE id=? AND revision=?",(decision,ident,revision)).rowcount
         if not changed: raise BusinessError("STALE","版本已更新，请刷新",409)
     return get(ident)
+
+def switch_basis(ident,revision,key,basis):
+    """切换单份样品的签发依据。先校验后落库：任何失败都不写库，原报告保留。"""
+    from app.modules.m7_review.rules import resolve,available_bases,default_basis,sample_key,group_key,BASES
+    if basis not in BASES: raise BusinessError("BASIS","依据类型无效")
+    current=get(ident)
+    result=current["result"]
+    samples=[r for r in result.get("quality",[]) if r.get("kind")=="sample"]
+    by_key={sample_key(s):s for s in samples}
+    if key not in by_key: raise BusinessError("SAMPLE","样品不存在",404)
+    evidence=result.get("spike_evidence",{"by_sample":{},"batch_avg":{}})
+    group=group_key(by_key[key])
+    if basis not in available_bases(key,group,evidence):
+        raise BusinessError("BASIS_UNAVAILABLE","该样品无此依据，已保留原报告")
+    overrides=dict(result.get("overrides",{}))
+    if basis==default_basis(key,group,evidence): overrides.pop(key,None)
+    else: overrides[key]=basis
+    resolved=resolve(samples,evidence,overrides)
+    new_result=dict(result,overrides=overrides,resolved=resolved)
+    with connect() as db:
+        changed=db.execute("UPDATE runs SET result=?,revision=revision+1 WHERE id=? AND revision=?",(json.dumps(new_result,ensure_ascii=False),ident,revision)).rowcount
+        if not changed: raise BusinessError("STALE","版本已更新，请刷新",409)
+    return get(ident)

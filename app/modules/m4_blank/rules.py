@@ -12,7 +12,7 @@ def apply(ctx):
         if c and r["kind"]=="blank":blanks.setdefault(key,[]).append((r["response"]-c["intercept"])/c["slope"])
     ctx["blanks"]={k:median(v) for k,v in blanks.items()};out=[]
     for r in ctx["normalized"]:
-        if r["kind"] not in {"sample","control"}:continue
+        if r["kind"] not in {"sample","control","spike"}:continue
         key=(r["batch"],r["analyte"]);curve=ctx["curves"].get(key)
         if not curve:quarantine(ctx,r,"CURVE_MISSING");continue
         if key not in ctx["blanks"]:quarantine(ctx,r,"BLANK_MISSING");continue

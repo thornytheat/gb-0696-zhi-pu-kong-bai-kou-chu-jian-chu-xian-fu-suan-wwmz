@@ -11,6 +11,7 @@ def classify(value,lod,overrange=False,control_error=None):
 def apply(ctx):
     out=[]
     for r in ctx["concentrations"]:
+        if r["kind"]=="spike":continue  # 加标行是回收率证据，不作为报告结果
         c=ctx["curves"][(r["batch"],r["analyte"])];x=dict(r)
         error=abs(r["concentration"]-r["level_value"])/r["level_value"] if r["kind"]=="control" and r["level_value"] else None
         x["status"]=classify(r["concentration"],r["lod"],r["response"]>c["max_response"],error)
